@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nerd Lights Preview Demo</title>
+  <title>Nerd Lights Preview Proof of Concept</title>
 </head>
 <body>
-  <h1>Nerd Lights Preview Demo</h1>
+  <h1>Nerd Lights Preview Proof of Concept
+  </h1>
   <p>This demonstrates LED preview using Web Assembly.</p>
 
   <p>The same C++ code can be used for web preview, and to control the lights from the microcontroller.</p> 
 
   <div id="led_preview"></div>
+  <br/>
 
   <label for="pattern_select">Select Pattern:</label>
   <select id="pattern_select">
@@ -41,15 +43,26 @@
         // create colored divs for each LED within the led_preview div
         const led_preview_div = document.getElementById('led_preview');
         led_preview_div.innerHTML = '';
+        led_preview_div.style.backgroundColor = 'black';
+        led_preview_div.style.display = 'inline-block';
+        led_preview_div.style.paddingRight = '10px';
+        led_preview_div.style.paddingLeft = '10px';
+        led_preview_div.style.paddingTop = '0px';
+        led_preview_div.style.paddingBottom = '2px';
+        led_preview_div.style.margin = '1px';
+        led_preview_div.style.border = '0px solid black';
+        let fragment = document.createElement('div');
         for (let i = 0; i < led_count; i++) {
           const led_div = document.createElement('div');
-          led_div.style.width = '6px';
-          led_div.style.height = '6px';
+          led_div.style.width = '5px';
+          led_div.style.height = '5px';
           led_div.style.backgroundColor = `rgb(${rgb_values[i * 3]}, ${rgb_values[i * 3 + 1]}, ${rgb_values[i * 3 + 2]})`;
           led_div.style.display = 'inline-block';
-          led_div.style.margin = '1px';
-          led_preview_div.appendChild(led_div);
+          led_div.style.margin = '2px';
+          led_div.style.padding = '0px';
+          fragment.appendChild(led_div);
         }
+        led_preview_div.appendChild(fragment);
 
         // Call renderLoop again after ~33ms (for ~30fps)
         setTimeout(renderLoop, 33);
