@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nerd Lights Preview Demo</title>
+</head>
+<body>
+  <h1>Nerd Lights Preview Demo</h1>
+  <p>This demonstrates LED preview using Web Assembly.</p>
+
+  <p>The same C++ code can be used for web preview, and to control the lights from the microcontroller.</p> 
+
+  <div id="led_preview"></div>
+
+  <label for="pattern_select">Select Pattern:</label>
+  <select id="pattern_select">
+    <option value="alternate">Alternate</option>
+    <option value="rainbow">Rainbow</option>
+  </select>
+
+
+  <label for="led_count_select">Select LED Count:</label>
+  <select id="led_count_select">
+    <option value="50">50</option>
+    <option value="100">100</option>
+    <option value="150">150</option>
+  </select>
+
+  <script src="led_control.js"></script>
+  <script>
+    let led_count = 50;
+    let pattern = 'alternate';
+    Module.onRuntimeInitialized = function() {
+
+      // Function to repeatedly call execute() about 30 times per second
+      function renderLoop() {
+        const buffer = Module.ccall('execute', 'number');
+        const rgb_values = new Uint8Array(Module.HEAPU8.buffer, buffer, 3 * led_count);  // 3 bytes per LED (R, G, B)
+
+        // create colored divs for each LED within the led_preview div
+        const led_preview_div = document.getElementById('led_preview');
+        led_preview_div.innerHTML = '';
+        for (let i = 0; i < led_count; i++) {
+          const led_div = document.createElement('div');
+          led_div.style.width = '6px';
+          led_div.style.height = '6px';
+          led_div.style.backgroundColor = `rgb(${rgb_values[i * 3]}, ${rgb_values[i * 3 + 1]}, ${rgb_values[i * 3 + 2]})`;
+          led_div.style.display = 'inline-block';
+          led_div.style.margin = '1px';
+          led_preview_div.appendChild(led_div);
+        }
+
+        // Call renderLoop again after ~33ms (for ~30fps)
+        setTimeout(renderLoop, 33);
+      }
+
+      function do_config() {
+        led_count = parseInt(document.getElementById('led_count_select').value);
+        pattern = document.getElementById('pattern_select').value;
+        Module.ccall('set_config', null, [ 'number', 'string'], [led_count, pattern]);
+      }
+
+      document.getElementById('pattern_select').addEventListener('change', function() {
+        do_config();
+      });
+
+      document.getElementById('led_count_select').addEventListener('change', function() {
+        do_config();
+      });
+
+      do_config();
+      renderLoop();
+    };
+
+  </script>
+</body>
+</html>
