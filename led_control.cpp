@@ -18,7 +18,7 @@ std::vector<RGB> ledConfig;
 extern "C" {
 
     RGB rainbow_from_position(float position, float cycle_length) {
-        float percent = fabs(remainder(position / cycle_length, 1.0));
+        float percent = 1.0 * fabs(fmod(position / cycle_length, 1.0));
 
         float r = 0.0f;
         float g = 0.0f;
